@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPERAÇÃO: GUERRA FRIA - Dossiê Classificado</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Share Tech Mono and Special Elite for Top Secret vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #050805;
+            color: #33ff33;
+            overflow-x: hidden;
+        }
+
+        .dossier-font {
+            font-family: 'Special Elite', cursive;
+        }
+
+        /* CRT Screen effect */
+        .crt::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            z-index: 99999;
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Vignette & Screen Glow */
+        .crt-glow {
+            box-shadow: inset 0 0 100px rgba(0, 255, 51, 0.15);
+        }
+
+        /* Scanline flicker */
+        @keyframes flicker {
+            0% { opacity: 0.97; }
+            50% { opacity: 1; }
+            100% { opacity: 0.98; }
+        }
+
+        .flicker {
+            animation: flicker 0.15s infinite;
+        }
+
+        /* Classified Stamp Animation */
+        @keyframes stampIn {
+            0% { transform: scale(3) rotate(-15deg); opacity: 0; }
+            70% { transform: scale(0.9) rotate(-5deg); opacity: 0.9; }
+            100% { transform: scale(1) rotate(-6deg); opacity: 1; }
+        }
+
+        .stamp-classified {
+            animation: stampIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a110a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1a4d1a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #33ff33;
+        }
+    </style>
+</head>
+<body class="crt crt-glow h-full flex flex-col justify-between selection:bg-green-500 selection:text-black">
+
+    <header class="border-b border-green-800 bg-black/80 px-4 py-3 flex flex-wrap justify-between items-center z-10">
+        <div class="flex items-center space-x-3">
+            <span class="inline-block w-3 h-3 bg-red-600 rounded-full animate-ping"></span>
+            <h1 class="text-xl md:text-2xl font-bold tracking-widest text-green-400">DEFCON 2 // ARQUIVO CIA-KGB</h1>
+        </div>
+        <div class="text-xs md:text-sm text-green-600 tracking-wider">
+            STATUS: <span id="defcon-status" class="text-red-500 font-bold">ALERTA MÁXIMO</span> | AGENTE: <span id="header-agent-name" class="text-amber-400">NÃO IDENTIFICADO</span>
+        </div>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center p-4 md:p-6 relative z-10 max-w-5xl mx-auto w-full">
+
+        <!-- BRIEFING SCREEN WITH REGISTRATION & LEADERBOARD -->
+        <div id="briefing-screen" class="w-full bg-zinc-950/90 border-2 border-green-800/80 rounded-lg p-6 md:p-8 shadow-2xl relative">
+            <div class="absolute -top-3 right-6 bg-red-900 text-red-100 px-3 py-1 text-xs font-bold tracking-widest border border-red-600 stamp-classified">
+                CLASSIFICADO // EYES ONLY
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Left/Main Column: Briefing & Registration -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="border-b border-green-900/60 pb-3">
+                        <span class="text-xs text-green-600 uppercase tracking-widest">Documento Nº 1945-1991</span>
+                        <h2 class="text-2xl md:text-3xl font-bold text-green-400 mt-1">BRIEFING DE OPERAÇÃO</h2>
+                    </div>
+
+                    <div class="text-green-300 space-y-3 text-sm md:text-base leading-relaxed">
+                        <p>Agente, antes de iniciar a avaliação de inteligência cobrindo os grandes marcos da Guerra Fria (1945–1991), é obrigatório o registro oficial do seu codinome no sistema.</p>
+                        <p>O sistema sorteará <strong class="text-green-400">10 questões fundamentais</strong> do nosso banco de dados com <strong class="text-green-400">100 registros</strong> históricos e embaralhará aleatoriamente as alternativas a cada execução.</p>
+                    </div>
+
+                    <!-- Registration Form -->
+                    <div class="bg-black/70 border border-green-900 p-4 rounded space-y-3">
+                        <label for="agent-input" class="block text-xs font-bold uppercase tracking-wider text-green-400">// CADASTRO DE IDENTIFICAÇÃO DO AGENTE:</label>
+                        <input type="text" id="agent-input" placeholder="Digite seu Nome ou Codinome (ex: Agente K)" maxlength="25"
+                            class="w-full bg-zinc-900 border border-green-700 rounded px-4 py-2.5 text-green-300 focus:outline-none focus:border-green-400 text-sm placeholder:text-green-800">
+                        <div id="name-error" class="text-xs text-red-500 font-bold hidden">⚠️ O codinome é obrigatório para iniciar a operação.</div>
+                    </div>
+
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="text-xs text-green-600">
+                            BANCO DE DADOS: <span class="text-green-400 font-bold">100 ITENS PRONTOS (ALEATÓRIOS)</span>
+                        </div>
+                        <button onclick="attemptStartQuiz()" class="w-full sm:w-auto bg-green-900 hover:bg-green-700 text-black font-bold px-8 py-3 rounded transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(0,255,0,0.3)] cursor-pointer text-center tracking-wider">
+                            [ INICIAR OPERAÇÃO ]
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Leaderboard (Ranking) -->
+                <div class="bg-black/80 border border-green-900/80 rounded-lg p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="border-b border-green-900 pb-2 mb-3 flex justify-between items-center">
+                            <h3 class="text-sm font-bold text-green-400 tracking-widest">// RANKING DE AGENTES</h3>
+                            <span class="text-[10px] text-amber-400">TOP 5</span>
+                        </div>
+                        <div id="leaderboard-list" class="space-y-2 text-xs md:text-sm">
+                            <!-- Populated dynamically -->
+                            <div class="text-green-700 text-center py-4">Nenhum registro encontrado no servidor.</div>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-2 border-t border-green-900/40 text-[10px] text-green-600 text-center">
+                        DADOS ARMAZENADOS NO LOCALSTORAGE
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUIZ SCREEN (Hidden initially) -->
+        <div id="quiz-screen" class="hidden w-full bg-zinc-950/90 border-2 border-green-800/80 rounded-lg p-6 md:p-8 shadow-2xl relative">
+            <!-- Progress & Timer Bar -->
+            <div class="flex flex-wrap justify-between items-center mb-6 border-b border-green-900/60 pb-3 gap-2">
+                <div class="text-xs md:text-sm text-green-500">
+                    SETOR: <span id="question-category" class="text-green-300 font-bold">GERAL</span>
+                </div>
+                <div class="text-xs md:text-sm text-green-400 font-bold">
+                    PERGUNTA <span id="current-q-num">1</span> / 10
+                </div>
+                <div class="text-xs text-amber-400 bg-amber-950/50 px-2.5 py-1 rounded border border-amber-800">
+                    TEMPO: <span id="timer-display">30</span>s
+                </div>
+            </div>
+
+            <!-- Question Text -->
+            <div class="mb-8">
+                <h3 id="question-text" class="text-lg md:text-2xl text-green-200 font-medium leading-relaxed">
+                    Carregando diretiva...
+                </h3>
+            </div>
+
+            <!-- Options Grid -->
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Options populated dynamically -->
+            </div>
+
+            <!-- Feedback / Next button area -->
+            <div id="feedback-area" class="mt-6 hidden flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-green-900/40 gap-4">
+                <div id="feedback-text" class="text-sm md:text-base font-bold"></div>
+                <button onclick="nextQuestion()" class="w-full sm:w-auto bg-green-800 hover:bg-green-600 text-black font-bold px-6 py-2 rounded transition-all tracking-wider cursor-pointer">
+                    PRÓXIMA DIRETIVA >>
+                </button>
+            </div>
+        </div>
+
+        <!-- DEBRIEFING / REPORT SCREEN (Hidden initially) -->
+        <div id="debrief-screen" class="hidden w-full bg-zinc-950/90 border-2 border-green-800/80 rounded-lg p-6 md:p-10 shadow-2xl relative">
+            <div class="absolute -top-3 right-6 bg-red-900 text-red-100 px-3 py-1 text-xs font-bold tracking-widest border border-red-600 stamp-classified">
+                RELATÓRIO DE CONCLUSÃO
+            </div>
+
+            <div class="space-y-6">
+                <div class="border-b border-green-900/60 pb-4">
+                    <h2 class="text-2xl md:text-3xl font-bold text-green-400">RESULTADO DA OPERAÇÃO: <span id="debrief-agent-name" class="text-amber-400"></span></h2>
+                    <p class="text-xs text-green-600 mt-1">Dossiê final processado e arquivado no banco central.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                    <div class="bg-black/60 border border-green-900 p-4 rounded">
+                        <span class="text-xs text-green-600 block">ACERTOS</span>
+                        <span id="final-score" class="text-3xl font-bold text-green-400">0/10</span>
+                    </div>
+                    <div class="bg-black/60 border border-green-900 p-4 rounded">
+                        <span class="text-xs text-green-600 block">PRECISÃO</span>
+                        <span id="final-accuracy" class="text-3xl font-bold text-amber-400">0%</span>
+                    </div>
+                    <div class="bg-black/60 border border-green-900 p-4 rounded">
+                        <span class="text-xs text-green-600 block">STATUS DA PATENTE</span>
+                        <span id="agent-rank" class="text-lg font-bold text-green-300">-</span>
+                    </div>
+                </div>
+
+                <div class="bg-black/80 border border-green-900/60 p-4 rounded text-sm text-green-300">
+                    <h4 class="font-bold text-green-400 mb-2">// AVALIAÇÃO DE DESEMPENHO DO AGENTE:</h4>
+                    <p id="rank-description" class="leading-relaxed">Analisando dados de inteligência...</p>
+                </div>
+
+                <div class="pt-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <span id="save-status-msg" class="text-xs text-amber-400 font-bold"></span>
+                    <button onclick="returnToBriefing()" class="w-full sm:w-auto bg-green-900 hover:bg-green-700 text-black font-bold px-8 py-3 rounded transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(0,255,0,0.3)] cursor-pointer tracking-wider">
+                        [ RETORNAR AO MENU PRINCIPAL ]
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-green-900 bg-black/80 px-4 py-2 text-center text-xs text-green-700 z-10">
+        SISTEMA OPERACIONAL DEFCON V.4.1991 // CONEXÃO SEGURA ESTABELECIDA
+    </footer>
+
+    <script>
+        // Banco de Dados com 100 Perguntas de Dificuldade Acessível / Conceitos Centrais da Guerra Fria
+        const questionDatabase = [
+            {
+                q: "O que defendia a chamada Doutrina Truman, anunciada em 1947 pelos Estados Unidos?",
+                options: [
+                    "O apoio militar e financeiro a qualquer país ameaçado pelo avanço do comunismo",
+                    "A desativação imediata de todas as ogivas nucleares americanas",
+                    "A divisão definitiva do território da Alemanha em quatro zonas",
+                    "A criação de um mercado comum exclusivo com a União Soviética"
+                ],
+                answer: 0,
+                category: "Doutrinas"
+            },
+            {
+                q: "Qual era o principal objetivo do Plano Marshall, criado pelos Estados Unidos após a Segunda Guerra Mundial?",
+                options: [
+                    "Financiar a reconstrução econômica dos países da Europa Ocidental para conter o comunismo",
+                    "Invadir militarmente a Europa Oriental para depor governos socialistas",
+                    "Administrar conjuntamente os recursos naturais da URSS",
+                    "Estabelecer uma moeda única em todo o continente americano"
+                ],
+                answer: 0,
+                category: "Economia"
+            },
+            {
+                q: "O que foi a chamada 'Cortina de Ferro', expressão popularizada por Winston Churchill?",
+                options: [
+                    "Uma cerca real de ferro construída na fronteira entre a França e a Espanha",
+                    "A divisão política, ideológica e física entre a Europa Ocidental capitalista e o bloco soviético oriental",
+                    "O apelido dado ao sistema de defesa antimísseis da OTAN",
+                    "O conjunto de regras de censura postal na União Soviética"
+                ],
+                answer: 1,
+                category: "Conceitos"
+            },
+            {
+                q: "Qual aliança militar defensiva foi criada em 1949 pelos países ocidentais liderados pelos Estados Unidos?",
+                options: ["Pacto de Varsóvia", "OTAN (Organização do Tratado do Atlântico Norte)", "COMECON", "Liga das Nações"],
+                answer: 1,
+                category: "Alianças"
+            },
+            {
+                q: "Em resposta à OTAN, a União Soviética e seus aliados criaram em 1955 qual aliança militar?",
+                options: ["Pacto de Varsóvia", "Plano Molotov", "Tratado de Paris", "Eixo socialista"],
+                answer: 0,
+                category: "Alianças"
+            },
+            {
+                q: "O que caracterizou o conflito histórico conhecido como Guerra Fria?",
+                options: [
+                    "Uma guerra mundial de combate direto com armas nucleares entre EUA e URSS",
+                    "Uma disputa ideológica, política, econômica e tecnológica sem confronto militar direto entre EUA e URSS",
+                    "Uma guerra travada exclusivamente no continente africano",
+                    "Um conflito comercial pacífico sem nenhuma tensão diplomática"
+                ],
+                answer: 1,
+                category: "Conceitos"
+            },
+            {
+                q: "Qual evento marcou o início da Corrida Espacial em outubro de 1957?",
+                options: [
+                    "A chegada do primeiro homem à Lua",
+                    "O lançamento do satélite soviético Sputnik 1",
+                    "A primeira viagem de um ser humano ao espaço",
+                    "A criação da agência espacial NASA"
+                ],
+                answer: 1,
+                category: "Corrida Espacial"
+            },
+            {
+                q: "Quem foi o primeiro ser humano a viajar para o espaço, em missão realizada pela União Soviética em 1961?",
+                options: ["Neil Armstrong", "Yuri Gagarin", "Buzz Aldrin", "John Glenn"],
+                answer: 1,
+                category: "Corrida Espacial"
+            },
+            {
+                q: "Em que ano a missão americana Apollo 11 pousou com sucesso na Lua?",
+                options: ["1961", "1965", "1969", "1972"],
+                answer: 2,
+                category: "Corrida Espacial"
+            },
+            {
+                q: "Por que o governo da Alemanha Oriental construiu o Muro de Berlim em agosto de 1961?",
+                options: [
+                    "Para impedir a fuga em massa de cidadãos do lado oriental (socialista) para o lado ocidental (capitalista)",
+                    "Para proteger a cidade de uma invasão militar iminente do Japão",
+                    "Para servir como um monumento comemorativo ao fim da Segunda Guerra",
+                    "Para separar duas religiões diferentes na Alemanha"
+                ],
+                answer: 0,
+                category: "Muro de Berlim"
+            },
+            {
+                q: "O que causou diretamente a Crise dos Mísseis de Cuba em outubro de 1962?",
+                options: [
+                    "A descoberta de bases de lançamento de mísseis nucleares soviéticos em Cuba por um avião espião americano",
+                    "A invasão bem-sucedida de Miami por tropas cubanas",
+                    "O fechamento do canal de Suez pela União Soviética",
+                    "O teste de uma bomba atômica na Flórida"
+                ],
+                answer: 0,
+                category: "Crise dos Mísseis"
+            },
+            {
+                q: "Quem era o presidente dos Estados Unidos durante a tensa Crise dos Mísseis de Cuba em 1962?",
+                options: ["Harry Truman", "Dwight Eisenhower", "John F. Kennedy", "Lyndon Johnson"],
+                answer: 2,
+                category: "Líderes"
+            },
+            {
+                q: "Quem era o principal líder da União Soviética durante a Crise dos Mísseis de Cuba?",
+                options: ["Josef Stálin", "Nikita Khrushchev", "Leonid Brejnev", "Mikhail Gorbatchov"],
+                answer: 1,
+                category: "Líderes"
+            },
+            {
+                q: "Como terminou diplomaticamente a Crise dos Mísseis de Cuba?",
+                options: [
+                    "Com uma guerra nuclear aberta que destruiu Havana e Miami",
+                    "Com a retirada dos mísseis soviéticos de Cuba após acordo secreto envolvendo mísseis americanos na Turquia e a não-invasão de Cuba",
+                    "Com a anexação de Cuba pelos Estados Unidos",
+                    "Com a rendição incondicional do governo de Fidel Castro"
+                ],
+                answer: 1,
+                category: "Crise dos Mísseis"
+            },
+            {
+                q: "O que foi a Guerra da Coreia (1950–1953)?",
+                options: [
+                    "Um conflito entre a Coreia do Norte (apoiada por China e URSS) e a Coreia do Sul (apoiada pelos EUA e ONU)",
+                    "Uma guerra civil pacífica resolvida sem intervenção estrangeira",
+                    "A invasão da Coreia pelo Império Britânico",
+                    "Uma disputa comercial marítima entre Coreia e Japão"
+                ],
+                answer: 0,
+                category: "Guerra da Coreia"
+            },
+            {
+                q: "Qual paralelo geográfico serviu como linha divisória entre a Coreia do Norte e a Coreia do Sul?",
+                options: ["Paralelo 20º N", "Paralelo 38º N", "Paralelo 49º N", "Linha do Equador"],
+                answer: 1,
+                category: "Guerra da Coreia"
+            },
+            {
+                q: "Qual foi o desfecho formal da Guerra da Coreia em 1953?",
+                options: [
+                    "A unificação completa da península sob um regime democrático",
+                    "A assinatura de um tratado de paz definitivo entre os dois países",
+                    "Um armistício que manteve a divisão da península por uma Zona Desmilitarizada, sem tratado de paz formal",
+                    "A vitória total do bloco socialista no sul"
+                ],
+                answer: 2,
+                category: "Guerra da Coreia"
+            },
+            {
+                q: "O que motivou a intervenção militar dos Estados Unidos na Guerra do Vietnã?",
+                options: [
+                    "A política de contenção ao comunismo e a teoria de que a queda do Vietnã faria outros países caírem como dominós",
+                    "O roubo de petróleo americano no Mar da China",
+                    "A anexação do Alasca pelo Vietnã do Norte",
+                    "A proteção de bases militares francesas permanentes"
+                ],
+                answer: 0,
+                category: "Guerra do Vietnã"
+            },
+            {
+                q: "O que ficou conhecido como a 'Teoria do Dominó' durante a Guerra Fria?",
+                options: [
+                    "A ideia de que se um país caísse sob o comunismo, os países vizinhos tenderiam a seguir o mesmo caminho",
+                    "Uma estratégia de jogo de tabuleiro usada pelos generais soviéticos",
+                    "A regra de cálculo financeiro do Plano Marshall",
+                    "Uma teoria econômica sobre a queda das bolsas de valores"
+                ],
+                answer: 0,
+                category: "Doutrinas"
+            },
+            {
+                q: "Como terminou o conflito da Guerra do Vietnã em 1975?",
+                options: [
+                    "Com a vitória do Vietnã do Norte, a queda de Saigon e a unificação do país sob o regime comunista",
+                    "Com a vitória militar esmagadora dos Estados Unidos",
+                    "Com a divisão permanente do Vietnã em quatro partes independentes",
+                    "Com a intervenção da ONU e criação de um governo neutro"
+                ],
+                answer: 0,
+                category: "Guerra do Vietnã"
+            },
+            {
+                q: "O que foi a política de 'Détente' (Desanuviamento) na década de 1970?",
+                options: [
+                    "Um período de redução das tensões diplomáticas e busca de acordos de paz e controle de armas entre EUA e URSS",
+                    "O aumento drástico das hostilidades e ameaças de bombardeio atômico",
+                    "O fechamento de todas as embaixadas soviéticas no ocidente",
+                    "A proibição do comércio internacional de trigo"
+                ],
+                answer: 0,
+                category: "Diplomacia"
+            },
+            {
+                q: "O que foram os acordos SALT (Strategic Arms Limitation Talks) assinados na era Détente?",
+                options: [
+                    "Tratados bilaterais entre EUA e URSS para limitar a produção de armas nucleares estratégicas",
+                    "Acordos de livre comércio de sal marinho e minerais na Europa",
+                    "Pactos de não-agressão naval no Oceano Atlântico",
+                    "Normas internacionais para o uso pacífico da energia solar"
+                ],
+                answer: 0,
+                category: "Desarmamento"
+            },
+            {
+                q: "O que significava a sigla MAD (Destruição Mútua Assegurada) na doutrina militar nuclear?",
+                options: [
+                    "Que um ataque nuclear total resultaria na aniquilação completa de ambas as superpotências, funcionando como desestímulo à guerra",
+                    "Um plano secreto de evacuação urbana em caso de furacão",
+                    "A aliança militar secreta entre os EUA e o Reino Unido",
+                    "O sistema de radares de longo alcance da União Soviética"
+                ],
+                answer: 0,
+                category: "Armas Nucleares"
+            },
+            {
+                q: "O que foi a Revolução Cubana liderada por Fidel Castro e Che Guevara em 1959?",
+                options: [
+                    "A derrubada da ditadura de Fulgêncio Batista, transformando Cuba posteriormente no primeiro estado socialista das Américas",
+                    "Um golpe militar apoiado diretamente pela CIA americana",
+                    "Uma revolta pacífica que integrou Cuba aos Estados Unidos",
+                    "A separação de Cuba em dois países independentes"
+                ],
+                answer: 0,
+                category: "América Latina"
+            },
+            {
+                q: "O que foi a fracassada Invasão da Baía dos Porcos em 1961?",
+                options: [
+                    "Uma tentativa frustrada de exilados cubanos, apoiados pela CIA, de depor o governo de Fidel Castro em Cuba",
+                    "Uma invasão naval soviética na costa da Flórida",
+                    "Um ataque frustrado da OTAN contra bases britânicas",
+                    "Uma revolta popular contra o presidente americano"
+                ],
+                answer: 0,
+                category: "Cuba"
+            },
+            {
+                q: "O que foi o Bloqueio de Berlim (1948-1949)?",
+                options: [
+                    "O fechamento soviético das vias terrestres de acesso a Berlim Ocidental, respondido pelos Aliados com uma imensa ponte aérea",
+                    "A construção inicial do Muro de Berlim por tropas alemãs",
+                    "O embargo comercial imposto pelos EUA contra a Alemanha Ocidental",
+                    "O bloqueio naval da frota alemã no Mar Báltico"
+                ],
+                answer: 0,
+                category: "Berlim"
+            },
+            {
+                q: "O que foi a Primavera de Praga em 1968 na Tchecoslováquia?",
+                options: [
+                    "Um movimento de reformas políticas em busca de um 'socialismo com rosto humano', que foi reprimido por tanques do Pacto de Varsóvia",
+                    "Uma revolução democrática bem-sucedida que encerrou o comunismo na Europa",
+                    "Um festival de música internacional realizado em Praga",
+                    "Um tratado de paz assinado entre tchecos e americanos"
+                ],
+                answer: 0,
+                category: "Europa Oriental"
+            },
+            {
+                q: "O que determinava a chamada Doutrina Brejnev (Soberania Limitada) na União Soviética?",
+                options: [
+                    "O direito da URSS de intervir militarmente em qualquer país socialista cujos rumos pudessem ameaçar o bloco soviético",
+                    "A total liberdade econômica e autonomia para os países do Leste Europeu",
+                    "O fim do comunismo em toda a Europa até o ano de 1990",
+                    "A aliança militar obrigatória entre a URSS e os países capitalistas"
+                ],
+                answer: 0,
+                category: "Doutrinas"
+            },
+            {
+                q: "O que foi a invasão soviética do Afeganistão em 1979?",
+                options: [
+                    "A intervenção militar da URSS para apoiar o governo comunista afegão contra guerrilheiros islâmicos, gerando forte reação e boicote ocidental",
+                    "A anexação pacífica do Afeganistão pela União Soviética",
+                    "Uma missão humanitária da ONU para distribuir alimentos",
+                    "Um ataque preventivo contra bases nucleares dos EUA"
+                ],
+                answer: 0,
+                category: "Afeganistão"
+            },
+            {
+                q: "O que foi o escândalo político americano conhecido como Watergate nos anos 1970?",
+                options: [
+                    "Uma operação de espionagem e grampeamento político interno que levou à renúncia do presidente Richard Nixon",
+                    "Um desvio secreto de verbas para a Guerra do Vietnã",
+                    "A revelação de testes nucleares secretos em território americano",
+                    "Um caso de corrupção envolvendo a agência espacial NASA"
+                ],
+                answer: 0,
+                category: "Política EUA"
+            },
+            {
+                q: "O que foi o movimento sindical 'Solidariedade' (Solidarność) na Polônia durante a década de 1980?",
+                options: [
+                    "O primeiro sindicato independente no bloco soviético, liderado por Lech Wałęsa, que desafiou o regime comunista",
+                    "Uma organização militar secreta financiada pela OTAN",
+                    "Um grupo de artistas que apoiava o governo comunista polonês",
+                    "Uma empresa estatal de exportação de carvão"
+                ],
+                answer: 0,
+                category: "Polônia"
+            },
+            {
+                q: "O que representou a Queda do Muro de Berlim em 9 de novembro de 1989?",
+                options: [
+                    "O principal símbolo histórico do fim iminente da Guerra Fria e da divisão da Europa",
+                    "O início oficial da Terceira Guerra Mundial",
+                    "A rendição militar incondicional da União Soviética aos EUA",
+                    "A destruição total da cidade de Berlim por terremoto"
+                ],
+                answer: 0,
+                category: "Queda do Muro"
+            },
+            {
+                q: "Em que data exata ocorreu a reunificação oficial da Alemanha após décadas de divisão?",
+                options: ["3 de outubro de 1990", "9 de novembro de 1989", "25 de dezembro de 1991", "1 de janeiro de 1995"],
+                answer: 0,
+                category: "Reunificação"
+            },
+            {
+                q: "Quem assumiu a liderança da União Soviética em 1985 e introduziu as famosas reformas da Perestroika e Glasnost?",
+                options: ["Mikhail Gorbatchov", "Boris Yeltsin", "Nikita Khrushchev", "Leonid Brejnev"],
+                answer: 0,
+                category: "Fim da URSS"
+            },
+            {
+                q: "O que significava a política de 'Glasnost' introduzida por Mikhail Gorbatchov na URSS?",
+                options: [
+                    "Transparência política, liberdade de expressão e abertura informativa no país",
+                    "A privatização total de todas as indústrias estatais em 24 horas",
+                    "O fim do armamento nuclear unilateral",
+                    "A unificação imediata com os Estados Unidos"
+                ],
+                answer: 0,
+                category: "Fim da URSS"
+            },
+            {
+                q: "O que significava a política de 'Perestroika' na União Soviética?",
+                options: [
+                    "Reestruturação econômica e modernização do sistema produtivo soviético",
+                    "Censura rígida a todos os meios de comunicação",
+                    "Adesão ao capitalismo neoliberal sem restrições",
+                    "Aliança militar formal com a OTAN"
+                ],
+                answer: 0,
+                category: "Fim da URSS"
+            },
+            {
+                q: "Qual foi o impacto do acidente nuclear de Chernobyl em 1986 na Ucrânia soviética?",
+                options: [
+                    "Abalou a confiança na tecnologia soviética e acelerou a necessidade de reformas políticas e transparência (Glasnost)",
+                    "Iniciou imediatamente a Terceira Guerra Mundial",
+                    "Provocou a rendição incondicional da URSS aos EUA",
+                    "Teve impacto nulo na política internacional"
+                ],
+                answer: 0,
+                category: "Fim da URSS"
+            },
+            {
+                q: "Em que data exata a bandeira soviética foi arriada do Kremlin, marcando a dissolução oficial da União Soviética?",
+                options: ["25 de dezembro de 1991", "9 de novembro de 1989", "3 de outubro de 1990", "1 de janeiro de 1992"],
+                answer: 0,
+                category: "Fim da URSS"
+            },
+            {
+                q: "Qual era o nome da agência de inteligência e espionagem dos Estados Unidos criada em 1947?",
+                options: ["CIA", "FBI", "NSA", "KGB"],
+                answer: 0,
+                category: "Espionagem"
+            },
+            {
+                q: "Como era chamada a principal agência de segurança e espionagem da União Soviética durante a Guerra Fria?",
+                options: ["KGB", "Stasi", "CIA", "MI6"],
+                answer: 0,
+                category: "Espionagem"
+            },
+            {
+                q: "O que foi o Macarthismo nos Estados Unidos durante os anos 1950?",
+                options: [
+                    "Uma intensa campanha de perseguição política e caça às bruxas contra suspeitos de comunismo, liderada pelo senador Joseph McCarthy",
+                    "Um plano econômico de ajuda aos desempregados",
+                    "Uma reforma educacional voltada para o ensino de ciências",
+                    "Um acordo de paz assinado com a China"
+                ],
+                answer: 0,
+                category: "Macarthismo"
+            },
+            {
+                q: "O que foram as chamadas 'Guerras por Procuração' (Proxy Wars) durante a Guerra Fria?",
+                    options: [
+                    "Conflitos regionais onde EUA e URSS apoiavam lados opostos com armas e dinheiro, sem entrar em confronto direto entre si",
+                    "Guerras travadas exclusivamente por robôs e inteligência artificial",
+                    "Disputas comerciais resolvidas em tribunais internacionais da ONU",
+                    "Guerras em que os países neutros combatiam as superpotências"
+                ],
+                answer: 0,
+                category: "Conceitos"
+            },
+            {
+                q: "Qual foi o objetivo do Plano Molotov, criado pela União Soviética em resposta ao Plano Marshall?",
+                options: [
+                    "Integrar economicamente os países socialistas do Leste Europeu e prestar assistência mútua",
+                    "Financiar campanhas eleitorais comunistas na Europa Ocidental",
+                    "Construir abrigos nucleares em Moscou",
+                    "Fornecer armas avançadas para o Vietnã"
+                ],
+                answer: 0,
+                category: "Economia"
+            },
+            {
+                q: "O que foi o incidente do avião espião U-2 americano abatido em 1960 sobre a URSS?",
+                options: [
+                    "Um episódio de espionagem que aumentou fortemente as tensões e cancelou uma cúpula entre EUA e URSS",
+                    "O início da Guerra da Coreia",
+                    "Um acordo pacífico de intercâmbio de pilotos",
+                    "A primeira missão tripulada americana ao espaço"
+                ],
+                answer: 0,
+                category: "Espionagem"
+            },
+            {
+                q: "O que foi o Movimento dos Países Não Alinhados, formalizado na Conferência de Bandung em 1955?",
+                options: [
+                    "Um grupo de nações (principalmente da Ásia e África) que recusou alinhamento automático com o bloco capitalista ou soviético",
+                    "Uma aliança militar secreta liderada pela Índia e pelo Brasil",
+                    "Um tratado de desarmamento nuclear assinado pela ONU",
+                    "Um bloco econômico exclusivo da América Latina"
+                ],
+                answer: 0,
+                category: "Diplomacia"
+            },
+            {
+                q: "Qual foi o impacto do boicote aos Jogos Olímpicos de Moscou em 1980?",
+                    options: [
+                    "Vários países ocidentais liderados pelos EUA não participaram dos jogos em protesto contra a invasão soviética do Afeganistão",
+                    "O cancelamento definitivo de todas as Olimpíadas modernas",
+                    "A vitória automática da equipe soviética em todas as modalidades",
+                    "A criação de um torneio olímpico alternativo nos EUA"
+                ],
+                answer: 0,
+                category: "Esportes"
+            },
+            {
+                q: "O que foi o famoso 'Milagre no Gelo' nas Olimpíadas de Inverno de 1980?",
+                options: [
+                    "A vitória da equipe de hóquei dos EUA sobre a poderosa equipe da União Soviética em meio a fortes tensões políticas",
+                    "A construção de uma pista de patinação gigante em Moscou",
+                    "O recorde mundial de patinação artística batido por um soviético",
+                    "Um pacto de paz assinado em uma pista de gelo"
+                ],
+                answer: 0,
+                category: "Esportes"
+            },
+            {
+                q: "O que eram os mísseis balísticos intercontinentais (ICBM)?",
+                options: [
+                    "Mísseis de longo alcance capazes de transportar ogivas nucleares de um continente para outro",
+                    "Foguetes usados exclusivamente para lançar satélites meteorológicos",
+                    "Torpedos navais de curto alcance para defesa costeira",
+                    "Mísseis antiaéreos portáteis de infantaria"
+                ],
+                answer: 0,
+                category: "Tecnologia Militar"
+            },
+            {
+                q: "O que foi a Iniciativa de Defesa Estratégica (IDS) proposta por Ronald Reagan nos anos 1980, apelidada de 'Guerra nas Estrelas'?",
+                options: [
+                    "Um sistema espacial de defesa antimísseis para interceptar ataques nucleares soviéticos",
+                    "O programa de colonização conjunta da Lua entre EUA e URSS",
+                    "Um acordo para desmilitarizar a órbita da Terra",
+                    "O lançamento da primeira estação espacial militar"
+                ],
+                answer: 0,
+                category: "Tecnologia Militar"
+            },
+            {
+                q: "O que determinava o Tratado de Não-Proliferação Nuclear (TNP) de 1968?",
+                options: [
+                    "O compromisso de impedir a disseminação de armas nucleares e tecnologia bélica para novos países",
+                    "A proibição total do uso de energia nuclear para fins civis e medicinais",
+                    "O desarmamento nuclear imediato e completo de EUA e URSS",
+                    "A permissão para qualquer país construir seu próprio arsenal atômico"
+                ],
+                answer: 0,
+                category: "Desarmamento"
+            },
+            {
+                q: "Qual era o nome oficial da Alemanha Ocidental durante a Guerra Fria?",
+                options: [
+                    "RFA (República Federal da Alemanha)",
+                    "RDA (República Democrática Alemã)",
+                    "República Socialista da Alemanha",
+                    "União Alemã Livre"
+                ],
+                answer: 0,
+                category: "Alemanha"
+            },
+            {
+                q: "Qual era o nome oficial da Alemanha Oriental durante a Guerra Fria?",
+                options: [
+                    "RDA (República Democrática Alemã)",
+                    "RFA (República Federal da Alemanha)",
+                    "Império Alemão do Leste",
+                    "Confederação de Berlim"
+                ],
+                answer: 0,
+                category: "Alemanha"
+            },
+            {
+                q: "O que foi a Operação Ajax no Irã em 1953?",
+                options: [
+                    "Um golpe de Estado organizado por CIA e MI6 para derrubar o primeiro-ministro iraniano Mohammad Mossadegh",
+                    "Uma invasão militar soviética nos campos petrolíferos do Irã",
+                    "Um plano de ajuda humanitária americana a Teerã",
+                    "O lançamento do primeiro satélite de comunicações iraniano"
+                ],
+                answer: 0,
+                category: "Intervenções"
+            },
+            {
+                q: "O que foi a Crise do Canal de Suez em 1956?",
+                options: [
+                    "A nacionalização do canal pelo Egito, gerando intervenção de Reino Unido, França e Israel, contornada pela pressão conjunta de EUA e URSS",
+                    "A construção do canal por engenheiros soviéticos",
+                    "Um bloqueio naval americano no Mar Vermelho",
+                    "A separação econômica do Egito e da Síria"
+                ],
+                answer: 0,
+                category: "Oriente Médio"
+            },
+            {
+                q: "O que significava a sigla DEFCON nas forças armadas dos Estados Unidos?",
+                options: ["Defense Condition (Condição de Defesa)", "Deployment Front Control", "Diplomatic Emergency Function", "Destruction Factor Confirmation"],
+                answer: 0,
+                category: "Militar"
+            },
+            {
+                q: "Qual nível de DEFCON representava o máximo estado de alerta para perigo iminente de guerra nuclear?",
+                options: ["DEFCON 1", "DEFCON 3", "DEFCON 5", "DEFCON 0"],
+                answer: 0,
+                category: "Militar"
+            },
+            {
+                q: "Quem foi o líder vietnamita que comandou a luta pela independência contra a França e depois contra os EUA no norte do Vietnã?",
+                options: ["Ho Chi Minh", "Ngo Dinh Diem", "Pol Pot", "Norodom Sihanouk"],
+                answer: 0,
+                category: "Guerra do Vietnã"
+            },
+            {
+                q: "Quem foi o líder soviético que promoveu a chamada 'desestalinização' e iniciou o degelo nas relações com o Ocidente nos anos 1950?",
+                options: ["Nikita Khrushchev", "Leonid Brejnev", "Mikhail Gorbatchov", "Yuri Andropov"],
+                answer: 0,
+                category: "Líderes Soviéticos"
+            },
+            {
+                q: "Qual presidente dos EUA renunciou ao cargo em 1974 devido ao escândalo de Watergate?",
+                options: ["Richard Nixon", "Lyndon B. Johnson", "Gerald Ford", "Jimmy Carter"],
+                answer: 0,
+                category: "Presidentes EUA"
+            },
+            {
+                q: "Qual presidente dos EUA ficou conhecido pela retórica dura contra a União Soviética, chamando-a de 'Império do Mal' nos anos 1980?",
+                options: ["Ronald Reagan", "John F. Kennedy", "Harry Truman", "Dwight Eisenhower"],
+                answer: 0,
+                category: "Presidentes EUA"
+            },
+            {
+                q: "Quem foi o fundador e primeiro líder supremo da Coreia do Norte, estabelecendo o regime socialista no país?",
+                options: ["Kim Il-sung", "Kim Jong-il", "Kim Jong-un", "Syngman Rhee"],
+                answer: 0,
+                category: "Coreia do Norte"
+            },
+            {
+                q: "O que foi a ideologia 'Juche' adotada oficialmente na Coreia do Norte?",
+                options: [
+                    "O princípio de autossuficiência nacional extrema e independência política e econômica",
+                    "A abertura total ao livre mercado e ao capitalismo ocidental",
+                    "A integração econômica direta com os Estados Unidos",
+                    "O alinhamento automático incondicional com a OTAN"
+                ],
+                answer: 0,
+                category: "Coreia do Norte"
+            },
+            {
+                q: "O que foi o Acordo de Paz de Paris de 1973?",
+                options: [
+                    "O acordo que determinou a retirada das forças militares dos Estados Unidos da Guerra do Vietnã",
+                    "O tratado que encerrou definitivamente a Guerra da Coreia",
+                    "O pacto de criação da União Europeia",
+                    "O acordo de desarmamento nuclear entre EUA e URSS"
+                ],
+                answer: 0,
+                category: "Guerra do Vietnã"
+            },
+            {
+                q: "Qual foi a importância do Papa João Paulo II na geopolítica da Guerra Fria?",
+                options: [
+                    "Apoiou fortemente o sindicato Solidariedade na Polônia, inspirando a resistência pacífica ao comunismo no Leste Europeu",
+                    "Financiou a compra de armas nucleares para a OTAN",
+                    "Negociou a dissolução oficial da Igreja Ortodoxa russa",
+                    "Assinou o tratado de paz final da Alemanha"
+                ],
+                answer: 0,
+                category: "Religião e Política"
+            },
+            {
+                q: "O que foi a Comunidade de Estados Independentes (CEI) criada em dezembro de 1991?",
+                options: [
+                    "Uma organização criada para substituir a URSS, reunindo parte das antigas repúblicas soviéticas em cooperação",
+                    "Uma aliança militar integrada com a OTAN",
+                    "Um bloco econômico liderado pelos Estados Unidos na Europa",
+                    "O novo parlamento unificado da Alemanha"
+                ],
+                answer: 0,
+                category: "Fim da URSS"
+            },
+            {
+                q: "O que foi o Projeto Apollo da NASA durante a Corrida Espacial?",
+                options: [
+                    "O programa espacial americano que teve como objetivo principal pousar homens na Lua",
+                    "O primeiro satélite lançado ao espaço em 1957",
+                    "O projeto soviético de estação espacial orbital",
+                    "A missão conjunta entre EUA e URSS em 1975"
+                ],
+                answer: 0,
+                category: "Corrida Espacial"
+            },
+            {
+                q: "Qual foi a importância da estação espacial soviética 'Mir', lançada em 1986?",
+                options: [
+                    "Foi a primeira estação espacial de pesquisa de longa permanência habitada continuamente em órbita",
+                    "Serviu como base de lançamento de mísseis nucleares soviéticos",
+                    "Foi o primeiro satélite americano a fotografar a Lua",
+                    "Estabeleceu o primeiro contato com satélites da OTAN"
+                ],
+                answer: 0,
+                category: "Corrida Espacial"
+            },
+            {
+                q: "O que foi o 'Agente Laranja' utilizado pelas forças americanas na Guerra do Vietnã?",
+                options: [
+                    "Um potente desfolhante químico usado para destruir florestas e plantações onde os guerrilheiros se escondiam",
+                    "Um tipo de aeronave de caça supersônica",
+                    "O codinome do plano de retirada das tropas de Saigon",
+                    "Um gás venenoso usado em ataques urbanos"
+                ],
+                answer: 0,
+                category: "Guerra do Vietnã"
+            },
+            {
+                q: "O que foi a Doutrina Eisenhower anunciada em 1957?",
+                    options: [
+                    "A garantia de assistência militar e econômica dos EUA a países do Oriente Médio ameaçados pelo comunismo",
+                    "O plano de desarmamento nuclear total da Europa",
+                    "A promessa de não intervir em assuntos da América Latina",
+                    "A criação do pacto militar americano no Pacífico"
+                ],
+                answer: 0,
+                category: "Doutrinas"
+            },
+            {
+                q: "Como a Guerra Fria impactou a cultura popular e o cinema nas décadas de 1950 e 1960?",
+                options: [
+                    "Gerou a proliferação de filmes de ficção científica sobre invasões alienígenas (metáforas para o medo do comunismo) e tramas de espionagem",
+                    "Provocou a proibição total de filmes de ação em Hollywood",
+                    "Eliminou qualquer referência a conflitos nas telas de cinema",
+                    "Focou exclusivamente em comédias românticas sem contexto histórico"
+                ],
+                answer: 0,
+                category: "Cultura"
+            },
+            {
+                q: "Qual foi o principal legado político deixado pelo fim da Guerra Fria em 1991?",
+                options: [
+                    "O fim do mundo bipolar e a ascensão temporária dos Estados Unidos como única superpotência global hegemônica",
+                    "A extinção imediata de todas as forças armadas do planeta",
+                    "A unificação de todos os países da Terra sob a bandeira da ONU",
+                    "O retorno do sistema colonial europeu na África e Ásia"
+                ],
+                answer: 0,
+                category: "Geopolítica"
+            },
+            {
+                q: "O que foi o Tratado INF de 1987 assinado por Reagan e Gorbatchov?",
+                options: [
+                    "Um acordo histórico que eliminou uma classe inteira de mísseis nucleares de alcance intermediário na Europa",
+                    "O tratado de livre comércio entre os Estados Unidos e a URSS",
+                    "O pacto de cooperação espacial pacífica em Marte",
+                    "A permissão para o livre trânsito em Berlim Ocidental"
+                ],
+                answer: 0,
+                category: "Desarmamento"
+            },
+            {
+                q: "O que foi a Cúpula de Malta em dezembro de 1989 entre Bush e Gorbatchov?",
+                options: [
+                    "Um encontro histórico considerado por muitos historiadores como o marco simbólico do encerramento oficial da Guerra Fria",
+                    "A assinatura do tratado de rendição militar da União Soviética",
+                    "A conferência que decidiu a divisão da Alemanha",
+                    "O acordo para a construção da Estação Espacial Internacional"
+                ],
+                answer: 0,
+                category: "Fim da URSS"
+            },
+            {
+                q: "O que foi o conflito indireto conhecido como Guerra Civil Angolana durante a Guerra Fria?",
+                options: [
+                    "Um conflito em Angola que envolveu o envio de tropas cubanas e apoio soviético de um lado, e forças sul-africanas e apoio dos EUA do outro",
+                    "Uma guerra civil na Europa Oriental entre comunistas e capitalistas",
+                    "Uma disputa territorial entre o Egito e Angola",
+                    "Uma revolta pacífica contra o colonialismo português"
+                ],
+                answer: 0,
+                category: "África"
+            },
+            {
+                q: "O que foi a Aliança para o Progresso criada pelos EUA na América Latina nos anos 1960?",
+                options: [
+                    "Um programa de ajuda econômica e social para conter a atração exercida pela Revolução Cubana na região",
+                    "Uma aliança militar para invadir países socialistas sul-americanos",
+                    "Um bloco comercial exclusivo entre Brasil e Estados Unidos",
+                    "Um acordo de desarmamento nuclear no hemisfério sul"
+                ],
+                answer: 0,
+                category: "América Latina"
+            },
+            {
+                q: "O que foi o incidente do Golfo de Tonquim em 1964?",
+                    options: [
+                    "Um suposto ataque contra navios de guerra dos EUA que serviu de justificativa para a escalada militar americana no Vietnã",
+                    "A assinatura do tratado de paz entre as Coreias",
+                    "O naufrágio de um submarino soviético no Pacífico",
+                    "Um acordo comercial entre China e Vietnã do Norte"
+                ],
+                answer: 0,
+                category: "Guerra do Vietnã"
+            },
+            {
+                q: "O que foi o programa espacial soviético 'Vostok'?",
+                options: [
+                    "O programa de voos espaciais tripulados da URSS que levou Yuri Gagarin ao espaço em 1961",
+                    "O projeto de construção da bomba de hidrogênio Tsar",
+                    "A rede de satélites espiões soviéticos em órbita baixa",
+                    "O sistema de mísseis balísticos intercontinentais da URSS"
+                ],
+                answer: 0,
+                category: "Corrida Espacial"
+            },
+            {
+                q: "O que foi o Círculo de Espiões de Cambridge (Cambridge Five) no Reino Unido?",
+                options: [
+                    "Um grupo de altos funcionários e intelectuais britânicos que repassaram segredos vitais para a União Soviética",
+                    "Cientistas que desenvolveram a bomba atômica inglesa",
+                    "Diplomatas que negociaram a criação da OTAN",
+                    "Jornalistas que cobriram a Queda do Muro de Berlim"
+                ],
+                answer: 0,
+                category: "Espionagem"
+            },
+            {
+                q: "Qual era o principal objetivo político da propaganda durante a Guerra Fria?",
+                options: [
+                    "Disseminar valores culturais, ideológicos e o estilo de vida de cada superpotência para conquistar corações e mentes globais",
+                    "Apenas entreter o público com filmes de comédia",
+                    "Vender produtos eletrônicos industriais no mercado negro",
+                    "Promover campeonatos mundiais de futebol sem interferência estatal"
+                ],
+                answer: 0,
+                category: "Cultura e Propaganda"
+            },
+            {
+                q: "Como a crise econômica estrutural da União Soviética nos anos 1980 influenciou o fim da Guerra Fria?",
+                options: [
+                    "A incapacidade do modelo soviético de sustentar os gastos militares e concorrer com os EUA levou à falência e ao colapso do bloco",
+                    "A economia soviética cresceu tanto que o país decidiu dissolver-se voluntariamente",
+                    "A URSS vendeu todo o seu território para pagar dívidas externas",
+                    "O país abandonou o socialismo devido à descoberta de petróleo na Sibéria"
+                ],
+                answer: 0,
+                category: "Fim da URSS"
+            },
+            {
+                q: "Qual foi o papel do presidente John F. Kennedy na crise de Berlim de 1961 e na crise dos mísseis?",
+                options: [
+                    "Adotou uma postura firme de defesa de Berlim Ocidental e conduziu a gestão diplomática da Crise dos Mísseis",
+                    "Ordenou a invasão militar imediata de Moscou",
+                    "Retirou todas as tropas americanas da Europa",
+                    "Assinou a rendição dos EUA perante a URSS"
+                ],
+                answer: 0,
+                category: "Líderes"
+            },
+            {
+                q: "O que foi o Pacto de Varsóvia em termos práticos para a Europa Oriental?",
+                options: [
+                    "O instrumento político e militar pelo qual a União Soviética manteve o controle rígido sobre os países do Leste Europeu",
+                    "Um tratado de livre comércio e livre circulação de pessoas na Europa",
+                    "Uma aliança pacífica voltada para a ecologia e o meio ambiente",
+                    "O acordo que integrou a Alemanha Oriental à OTAN"
+                ],
+                answer: 0,
+                category: "Alianças"
+            },
+            {
+                q: "O que simbolizou o fim do Muro de Berlim para as famílias alemãs e para o mundo?",
+                options: [
+                    "A reunificação de famílias separadas por décadas e o encerramento físico da principal divisão da Guerra Fria",
+                    "O início de uma nova guerra civil na Alemanha",
+                    "A destruição total da economia da Europa Ocidental",
+                    "A fusão das capitais de Paris e Berlim"
+                ],
+                answer: 0,
+                category: "Queda do Muro"
+            },
+            {
+                q: "Por que o conflito entre EUA e URSS foi denominado 'Guerra Fria'?",
+                options: [
+                    "Porque nunca houve um confronto bélico direto de grande escala entre as duas superpotências, embora houvesse constante hostilidade e tensão",
+                    "Porque a guerra ocorreu nos países mais frios do planeta, como Sibéria e Alasca",
+                    "Porque os exércitos utilizavam armas congelantes e criogenia",
+                    "Porque os tratados de paz foram assinados no inverno rigoroso de Moscou"
+                ],
+                answer: 0,
+                category: "Conceitos"
+            }
+        ];
+
+        let currentAgentName = "";
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let timerInterval = null;
+        let timeLeft = 30;
+        let answeredCurrent = false;
+
+        function getLeaderboard() {
+            try {
+                const data = localStorage.getItem('coldWarLeaderboard');
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveScoreToLeaderboard(name, score) {
+            let leaderboard = getLeaderboard();
+            leaderboard.push({
+                name: name.trim().toUpperCase(),
+                score: score,
+                date: new Date().toLocaleDateString('pt-BR')
+            });
+
+            // Ordenar por maior pontuação descrescente
+            leaderboard.sort((a, b) => b.score - a.score);
+
+            // Manter apenas os top 5
+            leaderboard = leaderboard.slice(0, 5);
+
+            try {
+                localStorage.setItem('coldWarLeaderboard', JSON.stringify(leaderboard));
+            } catch (e) {
+                console.error("Erro ao salvar no localStorage", e);
+            }
+        }
+
+        function renderLeaderboard() {
+            const listEl = document.getElementById('leaderboard-list');
+            const leaderboard = getLeaderboard();
+
+            if (leaderboard.length === 0) {
+                listEl.innerHTML = `<div class="text-green-700 text-center py-4">Nenhum registro encontrado no servidor.</div>`;
+                return;
+            }
+
+            listEl.innerHTML = '';
+            leaderboard.forEach((entry, idx) => {
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-center bg-black/60 border border-green-900/60 p-2 rounded text-xs";
+                
+                let medal = `#${idx + 1}`;
+                if (idx === 0) medal = "🥇";
+                if (idx === 1) medal = "🥈";
+                if (idx === 2) medal = "🥉";
+
+                row.innerHTML = `
+                    <div class="flex items-center space-x-2 truncate">
+                        <span class="font-bold text-amber-400 w-5">${medal}</span>
+                        <span class="text-green-300 truncate max-w-[110px] md:max-w-[140px]">${entry.name}</span>
+                    </div>
+                    <div class="text-green-400 font-bold">${entry.score}/10</div>
+                `;
+                listEl.appendChild(row);
+            });
+        }
+
+        // Executar renderização inicial ao carregar a página
+        window.onload = function() {
+            renderLeaderboard();
+        };
+
+        // Função robusta para embaralhar as alternativas de uma pergunta e atualizar o índice correto
+        function shuffleQuestionOptions(q) {
+            // Cria um array de objetos associando o texto da opção com a marcação de correta
+            let optionsWithMeta = q.options.map((opt, idx) => ({
+                text: opt,
+                isCorrect: idx === q.answer
+            }));
+
+            // Embaralha aleatoriamente as opções
+            optionsWithMeta.sort(() => Math.random() - 0.5);
+
+            // Extrai as novas opções embaralhadas e localiza o novo índice da resposta correta
+            let newOptions = optionsWithMeta.map(item => item.text);
+            let newAnswerIndex = optionsWithMeta.findIndex(item => item.isCorrect);
+
+            return {
+                ...q,
+                options: newOptions,
+                answer: newAnswerIndex
+            };
+        }
+
+        function attemptStartQuiz() {
+            const input = document.getElementById('agent-input');
+            const errorDiv = document.getElementById('name-error');
+            const name = input.value.trim();
+
+            if (!name) {
+                errorDiv.classList.remove('hidden');
+                input.classList.add('border-red-600');
+                return;
+            }
+
+            errorDiv.classList.add('hidden');
+            input.classList.remove('border-red-600');
+            currentAgentName = name;
+
+            document.getElementById('header-agent-name').innerText = currentAgentName.toUpperCase();
+
+            // Sortear 10 perguntas do banco de dados e aplicar o embaralhamento robusto de alternativas
+            const shuffled = [...questionDatabase].sort(() => 0.5 - Math.random());
+            currentQuestions = shuffled.slice(0, 10).map(q => shuffleQuestionOptions(q));
+            
+            currentIndex = 0;
+            score = 0;
+
+            // Alternar telas
+            document.getElementById('briefing-screen').classList.add('hidden');
+            document.getElementById('debrief-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            answeredCurrent = false;
+            const q = currentQuestions[currentIndex];
+            
+            document.getElementById('current-q-num').innerText = currentIndex + 1;
+            document.getElementById('question-category').innerText = q.category.toUpperCase();
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('feedback-area').classList.add('hidden');
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "text-left p-4 bg-black/60 border border-green-900 hover:border-green-400 hover:bg-green-950/40 rounded transition-all text-green-300 text-sm md:text-base cursor-pointer flex items-center space-x-3";
+                btn.innerHTML = `<span class="text-green-600 font-bold">[${String.fromCharCode(65 + idx)}]</span> <span>${opt}</span>`;
+                btn.onclick = () => selectOption(idx, btn);
+                container.appendChild(btn);
+            });
+
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            document.getElementById('timer-display').innerText = timeLeft;
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timer-display').innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timeOutQuestion();
+                }
+            }, 1000);
+        }
+
+        function timeOutQuestion() {
+            if (answeredCurrent) return;
+            answeredCurrent = true;
+            
+            const q = currentQuestions[currentIndex];
+            const buttons = document.getElementById('options-container').children;
+            
+            buttons[q.answer].classList.remove('border-green-900', 'bg-black/60');
+            buttons[q.answer].classList.add('border-green-500', 'bg-green-900/40', 'text-green-200');
+
+            for (let b of buttons) {
+                b.disabled = true;
+                b.classList.add('opacity-70', 'cursor-not-allowed');
+            }
+
+            const feedbackArea = document.getElementById('feedback-area');
+            const feedbackText = document.getElementById('feedback-text');
+            feedbackText.innerHTML = `<span class="text-amber-400">TEMPO ESGOTADO!</span> A resposta correta era: [${String.fromCharCode(65 + q.answer)}]`;
+            feedbackArea.classList.remove('hidden');
+        }
+
+        function selectOption(selectedIdx, btnElement) {
+            if (answeredCurrent) return;
+            answeredCurrent = true;
+            clearInterval(timerInterval);
+
+            const q = currentQuestions[currentIndex];
+            const buttons = document.getElementById('options-container').children;
+
+            for (let b of buttons) {
+                b.disabled = true;
+                b.classList.add('cursor-not-allowed');
+            }
+
+            const feedbackArea = document.getElementById('feedback-area');
+            const feedbackText = document.getElementById('feedback-text');
+
+            if (selectedIdx === q.answer) {
+                score++;
+                btnElement.classList.remove('border-green-900', 'bg-black/60');
+                btnElement.classList.add('border-green-400', 'bg-green-900/60', 'text-green-200', 'shadow-[0_0_10px_rgba(0,255,0,0.3)]');
+                feedbackText.innerHTML = `<span class="text-green-400">RESPOSTA CORRETA.</span> Acesso autorizado ao arquivo.`;
+            } else {
+                btnElement.classList.remove('border-green-900', 'bg-black/60');
+                btnElement.classList.add('border-red-600', 'bg-red-950/40', 'text-red-300');
+                
+                buttons[q.answer].classList.remove('border-green-900', 'bg-black/60');
+                buttons[q.answer].classList.add('border-green-500', 'bg-green-900/40', 'text-green-200');
+
+                feedbackText.innerHTML = `<span class="text-red-500">RESPOSTA INCORRETA.</span> A diretiva correta era [${String.fromCharCode(65 + q.answer)}].`;
+            }
+
+            feedbackArea.classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex < 10) {
+                loadQuestion();
+            } else {
+                showDebrief();
+            }
+        }
+
+        function showDebrief() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('debrief-screen').classList.remove('hidden');
+
+            document.getElementById('debrief-agent-name').innerText = currentAgentName.toUpperCase();
+            const accuracy = (score / 10) * 100;
+            document.getElementById('final-score').innerText = `${score}/10`;
+            document.getElementById('final-accuracy').innerText = `${accuracy}%`;
+
+            let rank = "";
+            let desc = "";
+
+            if (score === 10) {
+                rank = "DIRETOR DA CIA / KGB (MESTRE)";
+                desc = "Desempenho impecável. Você dominou todos os marcos centrais da Guerra Fria.";
+            } else if (score >= 8) {
+                rank = "ANALISTA SÊNIOR DE INTELIGÊNCIA";
+                desc = "Excelente trabalho. Você possui ótimo conhecimento sobre os blocos e alianças.";
+            } else if (score >= 5) {
+                rank = "OPERATIVO DE CAMPO";
+                desc = "Bom desempenho. Você conhece os fatos principais, mas houve falhas.";
+            } else if (score >= 2) {
+                rank = "RECRUTA EM TREINAMENTO";
+                desc = "Seu nível de informação histórico está abaixo do padrão. Recomenda-se revisão.";
+            } else {
+                rank = "AGENTE COMPROMETIDO";
+                desc = "Desempenho insatisfatório. Seus conhecimentos precisam ser reavaliados.";
+            }
+
+            document.getElementById('agent-rank').innerText = rank;
+            document.getElementById('rank-description').innerText = desc;
+
+            // Salvar no Ranking automático
+            saveScoreToLeaderboard(currentAgentName, score);
+            document.getElementById('save-status-msg').innerText = "✔️ Pontuação registrada no ranking central!";
+            
+            // Atualizar leaderboard em background
+            renderLeaderboard();
+        }
+
+        function returnToBriefing() {
+            document.getElementById('debrief-screen').classList.add('hidden');
+            document.getElementById('briefing-screen').classList.remove('hidden');
+            document.getElementById('agent-input').value = "";
+            document.getElementById('header-agent-name').innerText = "NÃO IDENTIFICADO";
+            renderLeaderboard();
+        }
+    </script>
+</body>
+</html>
